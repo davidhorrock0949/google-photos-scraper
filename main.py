@@ -1,7 +1,14 @@
 from selenium import webdriver
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.common.keys import Keys
+#from selenium.webdriver.common.action_chains import ActionChains
+#from selenium.webdriver.firefox.options import Options
+#from selenium.webdriver.common.keys import Keys
+
+#from selenium import webdriver
+from selenium.webdriver.support import ui
+from selenium.common.exceptions import TimeoutException
+
+
+
 from time import sleep
 import shelve
 
@@ -12,11 +19,25 @@ class Google:
         """
         initializes webdriver and browser.
         """
+
+       # Create driver with all the arguments
+        options = webdriver.ChromeOptions()
+        options.add_argument("--log-level=%d" % int(config.driver_log_level))
+        options.add_argument("--disable-logging")
+        options.add_argument("--disable-extensions")
+        if config.driver_headless:
+            options.add_argument("headless")
+
+        self.browser = webdriver.Remote(desired_capabilities=webdriver.DesiredCapabilities.CHROME,
+                                       command_executor='http://localhost:4444/wd/hub')
+        wait = ui.WebDriverWait(self.browser, 3)
+
+
         options = Options()
         options.headless = headlessness
-        self.browser = webdriver.Firefox(options=options, executable_path=r'geckodriver.exe')
-        with open('keys.txt') as f:
-            user, pw = f.readlines()
+#        self.browser = webdriver.Firefox(options=options, executable_path=r'geckodriver.exe')
+#        with open('keys.txt') as f:
+#            user, pw = f.readlines()
         # self.google_login(user, pw)
 
     def wait_until_load(self, element_wait_for_load):
@@ -152,7 +173,7 @@ class Google:
 #     print(db['links'])
 
 google = Google(headlessness=False)
-google.login()
+#google.login()
 google.get_links()
 # google.get_links()
 google.quit()
